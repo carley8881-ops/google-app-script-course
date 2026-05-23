@@ -67,14 +67,23 @@ function 條件式格式化示範() {
     .build();
   規則列表.push(警示規則);
 
-  // --- 規則 5：文字條件 — 包含「未達標」→ 紅底 ---
-  var 文字規則 = SpreadsheetApp.newConditionalFormatRule()
-    .whenTextContains("未達標")
-    .setBackground("#ff8a80")
-    .setFontColor("#ffffff")
+  // --- 規則 5a：自訂公式 — 狀態為「未達標」且達成率低於 70% → 深紅底白字 ---
+  var 未達標低於70 = SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied('=AND($F2="未達標", $E2<0.7)')
+    .setBackground("#c62828")        // 深紅
+    .setFontColor("#ffffff")         // 白字
     .setRanges([sheet.getRange("F2:F13")])  // 狀態欄
     .build();
-  規則列表.push(文字規則);
+  規則列表.push(未達標低於70);
+
+  // --- 規則 5b：自訂公式 — 狀態為「未達標」且達成率 >= 70% → 橘底深橘字 ---
+  var 未達標高於70 = SpreadsheetApp.newConditionalFormatRule()
+    .whenFormulaSatisfied('=AND($F2="未達標", $E2>=0.7)')
+    .setBackground("#ffe0b2")        // 橘底
+    .setFontColor("#e65100")         // 深橘字
+    .setRanges([sheet.getRange("F2:F13")])  // 狀態欄
+    .build();
+  規則列表.push(未達標高於70);
 
   // --- 規則 6：文字條件 — 包含「達標」→ 綠底 ---
   var 達標規則 = SpreadsheetApp.newConditionalFormatRule()
@@ -86,6 +95,12 @@ function 條件式格式化示範() {
 
   // 套用所有規則
   sheet.setConditionalFormatRules(規則列表);
+
+  // 調整欄寬至 70 並將所有文字置中
+  for (var c = 1; c <= 6; c++) {
+    sheet.setColumnWidth(c, 70);
+  }
+  sheet.getDataRange().setHorizontalAlignment("center");
 
   Logger.log("✅ 已建立 " + 規則列表.length + " 條條件式格式規則");
   SpreadsheetApp.getUi().alert("✅ 條件式格式化已套用！\n共 " + 規則列表.length + " 條規則。");
