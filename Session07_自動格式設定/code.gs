@@ -106,7 +106,7 @@ function 數字格式設定() {
   sheet.getRange("G5").setNumberFormat("0.00%");
   sheet.getRange("G6").setNumberFormat("$#,##0");
   sheet.getRange("G7").setNumberFormat("NT$#,##0");
-  sheet.getRange("G8").setNumberFormat("yyyy/mm/dd");
+  sheet.getRange("G8").setNumberFormat("yyyy-mm-dd");
   sheet.getRange("G9").setNumberFormat("hh:mm:ss");
   sheet.getRange("G10").setNumberFormat("yyyy/mm/dd hh:mm");
   sheet.getRange("G11").setNumberFormat('"第 "0" 名"');
@@ -306,26 +306,48 @@ function 一鍵美化() {
 
     // 標題列格式
     var 標題 = sheet.getRange(1, 1, 1, 最後欄);
-    標題.setBackground("#2196f3");
-    標題.setFontColor("#000000");
+    標題.setBackground("#0097a7");
+    標題.setFontColor("#ffffff");
     標題.setFontWeight("bold");
     標題.setFontSize(11);
     標題.setHorizontalAlignment("center");
-    sheet.setRowHeight(1, 35);
+    sheet.setRowHeights(1, 最後列, 30);
 
     // 斑馬紋
     for (var i = 2; i <= 最後列; i++) {
       var 行 = sheet.getRange(i, 1, 1, 最後欄);
-      行.setBackground(i % 2 === 0 ? "#e3f2fd" : "#ffffff");
+      行.setBackground(i % 2 === 0 ? "#e0f7fa" : "#ffffff");
     }
 
     // 框線
     資料範圍.setBorder(true, true, true, true, true, true,
-      "#90caf9", SpreadsheetApp.BorderStyle.SOLID);
+      "#b2ebf2", SpreadsheetApp.BorderStyle.SOLID);
 
     // 自動調整欄寬
     for (var c = 1; c <= 最後欄; c++) {
       sheet.autoResizeColumn(c);
+    }
+
+    // 水平與垂直皆置中
+    資料範圍.setHorizontalAlignment("center").setVerticalAlignment("middle");
+
+    // 針對含有「報告日期」的儲存格，將日期改為 "YYYY-MM-DD" 格式並加上底線
+    var 內容值 = 資料範圍.getValues();
+    for (var r = 0; r < 內容值.length; r++) {
+      for (var c = 0; c < 內容值[r].length; c++) {
+        var cellValue = 內容值[r][c];
+        if (cellValue && typeof cellValue === "string" && cellValue.indexOf("報告日期") !== -1) {
+          var match = cellValue.match(/報告日期[：:]\s*(\d{4})[年\-\/](\d{1,2})[月\-\/](\d{1,2})日?/);
+          var cell = sheet.getRange(r + 1, c + 1);
+          if (match) {
+            var 年 = match[1];
+            var 月 = match[2].length === 1 ? "0" + match[2] : match[2];
+            var 日 = match[3].length === 1 ? "0" + match[3] : match[3];
+            cell.setValue("報告日期：" + 年 + "-" + 月 + "-" + 日);
+          }
+          cell.setFontLine("underline");
+        }
+      }
     }
 
     // 凍結標題列

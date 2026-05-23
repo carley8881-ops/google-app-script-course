@@ -17,6 +17,10 @@ function 生成報價單() {
     if (客戶回應.getSelectedButton() !== ui.Button.OK) return;
     var 客戶 = 客戶回應.getResponseText().trim() || "範例客戶";
 
+    var 業務回應 = ui.prompt("📝 報價單", "請輸入業務人員姓名：", ui.ButtonSet.OK_CANCEL);
+    if (業務回應.getSelectedButton() !== ui.Button.OK) return;
+    var 業務人員 = 業務回應.getResponseText().trim() || "林冠廷";
+
     var 編號 = "QT-" + Utilities.formatDate(new Date(), "Asia/Taipei", "yyyyMMdd") + "-" +
                String(Math.floor(Math.random() * 100)).padStart(3, "0");
 
@@ -49,7 +53,7 @@ function 生成報價單() {
       ["報價編號", 編號, "", "客戶名稱", 客戶, ""],
       ["報價日期", Utilities.formatDate(今天, "Asia/Taipei", "yyyy/MM/dd"), "", "聯絡人", "", ""],
       ["有效期限", Utilities.formatDate(有效日, "Asia/Taipei", "yyyy/MM/dd"), "", "聯絡電話", "", ""],
-      ["業務人員", "林冠廷", "", "傳真", "", ""]
+      ["業務人員", 業務人員, "", "傳真", "", ""]
     ]);
 
     for (var r = 6; r <= 9; r++) {
